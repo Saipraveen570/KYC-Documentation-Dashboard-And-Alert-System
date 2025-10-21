@@ -1,4 +1,4 @@
-# KYC Compliance Dashboard - Power BI Project (v2)
+# KYC Compliance Dashboard - Power BI Project
 
 This repository contains everything needed to recreate the **KYC Compliance Dashboard** in Power BI:
 - Dataset (CSV) to import directly into Power BI
