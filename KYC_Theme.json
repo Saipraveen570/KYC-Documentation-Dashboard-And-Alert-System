@@ -1,0 +1,42 @@
+{
+  "name": "KYC Compliance Theme - Corporate",
+  "dataColors": [
+    "#0B2A4A",
+    "#2E8B57",
+    "#D97706",
+    "#DC2626",
+    "#6B7280",
+    "#93C5FD",
+    "#60A5FA",
+    "#A78BFA"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#0B2A4A",
+  "tableAccent": "#0B2A4A",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "color": [
+          {
+            "solid": {
+              "color": "#0B2A4A"
+            }
+          }
+        ],
+        "fontSize": 11
+      }
+    },
+    "titleText": {
+      "*": {
+        "fontSize": 14,
+        "color": [
+          {
+            "solid": {
+              "color": "#0B2A4A"
+            }
+          }
+        ]
+      }
+    }
+  }
+}

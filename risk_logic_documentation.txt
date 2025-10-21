@@ -1,0 +1,15 @@
+Risk Rating & Flags - Logic Documentation
+
+RiskRating field generation logic (synthetic dataset):
+- AssetsUnderManagement (AUM) driven thresholds:
+  - AUM > 20,000,000 => likely High / Critical (business judgement)
+  - AUM 1,000,000 - 20,000,000 => Medium/High
+  - AUM < 1,000,000 => Low/Medium
+- Random uplift to Critical for ~2% of records to simulate escalations
+- KYCStatus influences operational flags: Expired + High risk => immediate remediation required
+
+Operational flags to create in Power BI (examples):
+- ExpiringSoonFlag = IF([CalcDaysToExpiry] <= 30 && [CalcDaysToExpiry] >= 0, 1, 0)
+- HighRiskNonCompliant = IF('kyc_clients_dataset'[RiskRating] IN {"High","Critical"} && 'kyc_clients_dataset'[KYCStatus] <> "Valid", 1, 0)
+
+Use these flags to create filtered visuals, conditional formatting and alerts.

@@ -1,0 +1,58 @@
+Power Query (M) - Advanced Editor
+--------------------------------
+let
+    Source = Csv.Document(File.Contents("kyc_clients_dataset.csv"),[Delimiter=",", Columns=15, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+    PromotedHeaders = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+    ChangedTypes = Table.TransformColumnTypes(PromotedHeaders, {
+        {"ClientID", type text},
+        {"ClientName", type text},
+        {"ClientType", type text},
+        {"Region", type text},
+        {"Country", type text},
+        {"RelationshipManager", type text},
+        {"KYCStatus", type text},
+        {"KYCSubmissionDate", type date},
+        {"KYCLastUpdate", type date},
+        {"ExpiryDate", type date},
+        {"SourceSystem", type text},
+        {"RiskRating", type text},
+        {"ReviewFrequency", type text},
+        {"AssetsUnderManagement", type number},
+        {"DaysToExpiry", Int64.Type}
+    }),
+    Today = Date.From(DateTime.LocalNow()),
+    Add_DaysToExpiry = Table.AddColumn(ChangedTypes, "CalcDaysToExpiry", each Duration.Days([ExpiryDate] - Today), Int64.Type)
+in
+    Add_DaysToExpiry
+
+DAX Measures
+------------
+Total Clients = COUNTROWS('kyc_clients_dataset')
+
+Clients Expiring in 30 Days = 
+CALCULATE(
+    COUNTROWS('kyc_clients_dataset'),
+    FILTER('kyc_clients_dataset', 'kyc_clients_dataset'[CalcDaysToExpiry] <= 30 && 'kyc_clients_dataset'[CalcDaysToExpiry] >= 0)
+)
+
+Fully Compliant % =
+VAR valid = CALCULATE(COUNTROWS('kyc_clients_dataset'), 'kyc_clients_dataset'[KYCStatus] = "Valid")
+RETURN DIVIDE(valid, [Total Clients], 0)
+
+Missing Docs % =
+VAR miss = CALCULATE(COUNTROWS('kyc_clients_dataset'), 'kyc_clients_dataset'[KYCStatus] = "Missing")
+RETURN DIVIDE(miss, [Total Clients], 0)
+
+Expired Docs % =
+VAR exp = CALCULATE(COUNTROWS('kyc_clients_dataset'), 'kyc_clients_dataset'[KYCStatus] = "Expired")
+RETURN DIVIDE(exp, [Total Clients], 0)
+
+High Risk Pending Review = 
+CALCULATE(
+    COUNTROWS('kyc_clients_dataset'),
+    FILTER('kyc_clients_dataset', 'kyc_clients_dataset'[RiskRating] IN {"High","Critical"} && 'kyc_clients_dataset'[KYCStatus] <> "Valid")
+)
+
+Avg Days to Expiry = AVERAGEX( FILTER('kyc_clients_dataset', NOT(ISBLANK('kyc_clients_dataset'[CalcDaysToExpiry]))),
+    'kyc_clients_dataset'[CalcDaysToExpiry]
+)
